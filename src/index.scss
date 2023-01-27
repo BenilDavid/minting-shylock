@@ -1,0 +1,113 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.orange-text{
+  color: #ff8012;
+}
+.red-text{
+  color: rgb(228, 4, 4);
+}
+.green-text{
+  color: rgb(6, 207, 6);
+}
+.dapp_btn{
+  width: fit-content;
+  font-size: calc(10px + 1vmin);
+  cursor: pointer;
+  padding: 5px 12px;
+  color: #ff8012;
+  outline: none;
+  border: 1px solid #ff8012;
+  border-radius: 6px;
+  background-color: #000;
+}
+
+.cursor-pointer{
+  cursor: pointer;
+}
+
+.input-field{
+  // width: 280px;
+  width: 100%;
+  color: #ff8012 !important;
+  background-color: #000000 !important;
+  outline: none;
+  padding: 10px 10px;
+  font-size: 1rem;
+  border: 1px solid #ff8012 !important;
+  border-radius: 5px;
+  &::placeholder{
+    color: #ff811285;
+  }
+}
+
+// connect wallet
+.css-1bnwz7w {
+  min-width: 160px !important;
+  width: auto !important;
+
+  position: relative;
+  border-radius: 5px !important;
+  padding: 0.75em 1.25em;
+  padding-right: 0.75em;
+  padding-left: 1.25em;
+  font-size: 1em;
+  font-weight: 500 !important;
+  letter-spacing: 0.5px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 0.5em;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: space-evenly;
+  -ms-flex-pack: space-evenly;
+  -webkit-justify-content: space-evenly;
+  justify-content: space-evenly;
+  color: #ff8012 !important;
+  border: 1px solid #ff8012 !important;
+  background: #000;
+  &:hover {
+    background-color: #000 !important;
+  }
+  svg {
+    display: none !important;
+  }
+}
+
+.css-55ygxk {
+  min-width: 160px !important;
+  border-radius: 5px !important;
+  font-weight: 500 !important;
+  color: #ff8012 !important;
+  border: 1px solid #ff8012 !important;
+  background: #000;
+}
+
+// .custom-toast{
+// background-color: #ff8012;
+// }
+
+// .Toastify__toast--rtl {
+// background-color: #ff8012;
+// }
+// .Toastify__toast-body {
+// background-color: #ff8012;
+// }
+// .Toastify__toast-container--bottom-right {
+// background-color: #ff8012;
+// }
