@@ -20,7 +20,8 @@ function App() {
   let navigate = useNavigate();
 
   const [isWhiteListUser, setIsWhiteListUser] = useState(false);
-  const [tokenCount, setTokenCount] = useState(1);
+  const [publicTokenCount, setPublicTokenCount] = useState(1);
+  const [whitelistTokenCount, setWhitelistTokenCount] = useState(1);
   const [hexProof, setHexProof] = useState([]);
   // const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
@@ -30,8 +31,8 @@ function App() {
     allowlistMints: "",
     price: "",
     presalePrice: "",
-    maxPerALWallet: "",
-    maxPerWallet: "",
+    whiteListMaxToken: "",
+    publicMaxToken: "",
     totalMinted: "",
     preSaleStarted: true,
     freeMax: null,
@@ -67,7 +68,7 @@ function App() {
 
     if (whitelist.includes(address)) {
       setIsWhiteListUser(true);
-      // setTokenCount(2);
+      // setPublicTokenCount(2);
 
     } else {
       setIsWhiteListUser(false);
@@ -90,15 +91,15 @@ function App() {
         let price = ethers.utils.formatEther(tempPrice)
         let tempPresalePrice = await nftContract.wlMintPrice();
         let presalePrice = ethers.utils.formatEther(tempPresalePrice)
-        let maxPerALWallet = await nftContract.wlMaxMint();
-        let maxPerWallet = await nftContract.publicMaxMint();
+        let whiteListMaxToken = await nftContract.wlMaxMint();
+        let publicMaxToken = await nftContract.publicMaxMint();
         let totalMinted = await nftContract.totalSupply();
         let isPreSaleStarted = await nftContract.wlMintEnabled();
         let freeMax = await nftContract.freeMax();
         console.log('freemax', freeMax.toNumber());
 
         setContractDetails((prev) => {
-          return { ...prev, "MAX_TOKENS": MAX_TOKENS.toString(), "price": price.toString(), "presalePrice": presalePrice.toString(), "maxPerALWallet": maxPerALWallet.toString(), "maxPerWallet": maxPerWallet.toString(), "totalMinted": totalMinted.toString(), "preSaleStarted": isPreSaleStarted, "freeMax": freeMax.toNumber() }
+          return { ...prev, "MAX_TOKENS": MAX_TOKENS.toString(), "price": price.toString(), "presalePrice": presalePrice.toString(), "whiteListMaxToken": whiteListMaxToken.toString(), "publicMaxToken": publicMaxToken.toString(), "totalMinted": totalMinted.toString(), "preSaleStarted": isPreSaleStarted, "freeMax": freeMax.toNumber() }
         });
       }
     } catch (error) {
@@ -108,7 +109,6 @@ function App() {
 
   //public Mint
   const publicMinting = async () => {
-
     if (window.ethereum) {
 
       const nftContract = new ethers.Contract(
@@ -118,10 +118,10 @@ function App() {
       );
       try {
 
-          await nftContract.publicMint(
-            ethers.BigNumber.from(tokenCount), {
-            value: ethers.utils.parseEther((contractDetails.price * tokenCount).toString()),
-          });
+        await nftContract.publicMint(
+          ethers.BigNumber.from(publicTokenCount), {
+          value: ethers.utils.parseEther((contractDetails.price * publicTokenCount).toString()),
+        });
 
         // let tx = await nftMinting.wait();
         // console.log(tx);
@@ -154,19 +154,19 @@ function App() {
 
       try {
         console.log(contractDetails.freeMax);
-        if(contractDetails.freeMax < 4){
-          console.log("1 nft free", contractDetails.price * (tokenCount - 1));
-        await nftContract.whitelistMint(ethers.BigNumber.from(tokenCount), hexProof,
-          {
-            value: ethers.utils.parseEther((contractDetails.presalePrice * (tokenCount - 1)).toString()),
-          },
-        );
-        }else{
-          await nftContract.whitelistMint(ethers.BigNumber.from(tokenCount), hexProof,
-          {
-            value: ethers.utils.parseEther((contractDetails.presalePrice * tokenCount).toString()),
-          },
-        );
+        if (contractDetails.freeMax < 4) {
+          console.log("1 nft free", contractDetails.price * (publicTokenCount - 1));
+          await nftContract.whitelistMint(ethers.BigNumber.from(publicTokenCount), hexProof,
+            {
+              value: ethers.utils.parseEther((contractDetails.presalePrice * (publicTokenCount - 1)).toString()),
+            },
+          );
+        } else {
+          await nftContract.whitelistMint(ethers.BigNumber.from(publicTokenCount), hexProof,
+            {
+              value: ethers.utils.parseEther((contractDetails.presalePrice * publicTokenCount).toString()),
+            },
+          );
         }
       } catch (error) {
         toast.error("User rejected transaction", {
@@ -210,28 +210,28 @@ function App() {
     })
   }
 
-  function handleTokenDecrease() {
-  //   if (isWhiteListUser && contractDetails.preSaleStarted) {
-  //   if (tokenCount > 2) {
-  //     setTokenCount(tokenCount - 1);
-  //   }
-  // }else{
-    if (tokenCount > 1) {
-      setTokenCount(tokenCount - 1);
+  function handleWhiteListTokenDecrease() {
+    if (whitelistTokenCount > 1) {
+      setWhitelistTokenCount(whitelistTokenCount - 1);
     }
-  // }
   }
-  const handleTokenIncrease = () => {
-    if (isWhiteListUser && contractDetails.preSaleStarted) {
-      if (tokenCount < contractDetails.maxPerALWallet) {
-        setTokenCount(tokenCount + 1);
-      }
-    } else {
-      if (tokenCount < contractDetails.maxPerWallet) {
-        setTokenCount(tokenCount + 1);
-      }
-    }
 
+  const handleWhiteListTokenIncrease = () => {
+    if (whitelistTokenCount < contractDetails.whiteListMaxToken) {
+      setWhitelistTokenCount(whitelistTokenCount + 1);
+    }
+  }
+
+  function handlePublicTokenDecrease() {
+    if (publicTokenCount > 1) {
+      setPublicTokenCount(publicTokenCount - 1);
+    }
+  }
+
+  const handlePublicTokenIncrease = () => {
+    if (publicTokenCount < contractDetails.publicMaxToken) {
+      setPublicTokenCount(publicTokenCount + 1);
+    }
   }
 
   return (
@@ -240,7 +240,6 @@ function App() {
       <div className="mint-container text-center">
         <div className="header d-flex">
           <div className="twitter-id back-btn ms-3">
-
           </div>
           <div className="logo-container cursor-pointer" onClick={() => navigate('/')}>
             <img src={logo} className="shylock-logo" alt="logo" />
@@ -253,84 +252,61 @@ function App() {
               />
             </div>
           </div>
-
         </div>
-        {/* <div className="header row align-items-center">
-          <div className="col-md-2"></div>
-          <div className="col-md-8 logo-container my-2 cursor-pointer">
-            <img src={logo} className="shylock-logo" alt="logo" />
-          </div>
-          <div className="col-md-2 connect-wallet">
-            <ConnectWallet
-              accentColor="#000"
-            />
-          </div>
-        </div> */}
 
-        <div className='row main-container'>
+        <div className='row mx-5 main-container'>
+
+          {isWhiteListUser ?
+            <>
+              <div className="col-md-4 d-flex flex-column justify-content-center">
+                <div className='minting-box'>
+                  <div>
+                    <div className='orange-text my-2'>Token Count</div>
+                    <div className="token-input-container d-flex justify-content-center align-items-center">
+                      <button className="decrease-count dapp_btn" onClick={handleWhiteListTokenDecrease}>-</button>
+                      <div className="token-value dapp_btn mx-2">{whitelistTokenCount}</div>
+                      <button className="increase-count dapp_btn" onClick={handleWhiteListTokenIncrease}>+</button>
+                    </div>
+                    <div className='my-2 orange-text cursor-pointer' onClick={() => setWhitelistTokenCount(contractDetails.whiteListMaxToken)}>max : {contractDetails.whiteListMaxToken}
+                    </div>
+                  </div>
+                  <div className='text-center d-flex flex-column justify-content-center align-items-center'>
+                    <button className='ms-2 my-2 dapp_btn' onClick={whiteListMinting}>WhiteList Mint</button>
+                  </div>
+                </div>
+              </div>
+            </>
+            :
+            ""
+          }
+
           <div className="col-md-4 d-flex flex-column justify-content-center">
             <div className='contract-details'>
               <div>
-                {/* <div>Metamask address : <span className='orange-text'>{address}</span></div> */}
-                {/* <div><b>CONTRACT DETAILS</b></div> */}
                 <div>Supply : <span className='orange-text'>{contractDetails.totalMinted ? contractDetails.totalMinted : "XXXX"} / {contractDetails.MAX_TOKENS ? contractDetails.MAX_TOKENS : "XXXX"}</span></div>
-                {/* <div>allowlistMints : <span className='orange-text'>{contractDetails.allowlistMints}</span></div> */}
-                {/* {!isWhiteListUser ? */}
                 <div>price : <span className='orange-text'>{contractDetails.price} ETH</span></div>
-                {/* : */}
                 <div>Whitelist Price : <span className='orange-text'>{contractDetails.presalePrice} ETH</span></div>
-                {/* } */}
-
-
-                {/* <div>max Whitelist token : <span className='orange-text'>{contractDetails.maxPerALWallet}</span></div>
-          <div>max token : <span className='orange-text'>{contractDetails.maxPerWallet}</span></div> */}
               </div>
             </div>
-
           </div>
+
           <div className="col-md-4 d-flex flex-column justify-content-center">
             <div className='minting-box'>
               <div>
                 <div className='orange-text my-2'>Token Count</div>
                 <div className="token-input-container d-flex justify-content-center align-items-center">
-                  <button className="decrease-count dapp_btn" onClick={handleTokenDecrease}>-</button>
-                  <div className="token-value dapp_btn mx-2">{tokenCount}</div>
-                  <button className="increase-count dapp_btn" onClick={handleTokenIncrease}>+</button>
+                  <button className="decrease-count dapp_btn" onClick={handlePublicTokenDecrease}>-</button>
+                  <div className="token-value dapp_btn mx-2">{publicTokenCount}</div>
+                  <button className="increase-count dapp_btn" onClick={handlePublicTokenIncrease}>+</button>
                 </div>
-                <div className='my-2 orange-text cursor-pointer' onClick={isWhiteListUser && contractDetails.preSaleStarted ? () => setTokenCount(contractDetails.maxPerALWallet) : () => setTokenCount(contractDetails.maxPerWallet)}>max : {isWhiteListUser ?
-                  contractDetails.preSaleStarted ? contractDetails.maxPerALWallet : contractDetails.maxPerWallet
-                  : contractDetails.maxPerWallet}
+                <div className='my-2 orange-text cursor-pointer' onClick={() => setPublicTokenCount(contractDetails.publicMaxToken)}>max : {contractDetails.publicMaxToken}
                 </div>
               </div>
-
               <div className='text-center d-flex flex-column justify-content-center align-items-center'>
-
-                {address && (
-                  isWhiteListUser ?
-                    contractDetails.preSaleStarted ?
-                      <button className='ms-2 my-2 dapp_btn' onClick={whiteListMinting}>WhiteList Mint</button>
-                      :
-                      <button className='ms-2 my-2 dapp_btn' onClick={publicMinting}>Mint</button>
-                    :
-                    <button className='ms-2 my-2 dapp_btn' onClick={publicMinting}>Mint</button>
-                )
-                }
-                {
-                  address && (
-                    isWhiteListUser ?
-                      contractDetails.preSaleStarted ? 
-                      <div className='my-2'>You are Whitelisted</div> 
-                      : 
-                      <div className='my-2'>Your Whitelist Tokens are completed</div>
-                      :
-                      <div className='my-2'>You are not WhiteListed</div>
-                  )
-                }
+                <button className='ms-2 my-2 dapp_btn' onClick={publicMinting}>Public Mint</button>
               </div>
             </div>
-
           </div>
-          <div className="col-md-4"></div>
         </div>
 
       </div>
